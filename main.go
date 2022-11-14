@@ -9,17 +9,22 @@ import (
 	"time"
 
 	"github.com/ele-fant/handlers"
+	"github.com/nicholasjackson/env"
 )
 
+var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
+
 func main() {
+
+	//env.Parse()
+
 	// register a function to DefaulServeMux
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-	hh := handlers.NewHello(l)
-	bh := handlers.NewBye(l)
+
+	ph := handlers.NewProduct(l)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", bh)
+	sm.Handle("/", ph)
 
 	// create a server
 	s := &http.Server{
