@@ -1,4 +1,4 @@
-package jasonapi
+package jsonapi
 
 import (
 	"bytes"
@@ -172,6 +172,8 @@ func Serve(db *sql.DB, bind string) { // bind = server IP address
 	http.Handle("/email/get_batch", GetEmailBatch(db))
 	http.Handle("/email/update", UpdateEmail(db))
 	http.Handle("/email/delete", DeleteEmail(db))
+
+	log.Printf("JSON API serve listending on %v\n", bind)
 
 	err := http.ListenAndServe(bind, nil)
 	if err != nil {
