@@ -28,5 +28,5 @@ service MailingListService {
 	rpc GetEmail(GetEmailRequest) returns (EmailResponse) {}
 	rpc UpdateEmail(UpdateEmailRequest) returns (EmailResponse) {}
 	rpc DeleteEmail(DeleteEmailRequest) returns (EmailResponse) {}
-	rpc GetBatchEmail(GetEmailBatchRequest) returns (EmailResponse) {}
+	rpc GetBatchEmail(GetEmailBatchRequest) returns (GetEmailBatchResponse) {}
 }
