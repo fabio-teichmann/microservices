@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"microservice/handlers"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -41,7 +43,28 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	server.ListenAndServe()
+	// this will block
+	// server.ListenAndServe()
+	// using a go routine instead to not block
+	go func() {
+		err := server.ListenAndServe()
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}()
+
+	// graceful shut-down:
+	// waits for all running requests to be finished
+	sigChan := make(chan os.Signal)
+	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Kill)
+
+	sig := <-sigChan
+	logger.Println("Received terminate, graceful shutdown", sig)
+
+	timeoutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	server.Shutdown(timeoutContext)
+
 	// BIND address, HANDLER
 	// most basic webserver; if HANDLER not specified, it uses the default ServMux
 	// http.ListenAndServe(":9090", serveMux)
