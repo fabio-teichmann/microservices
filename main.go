@@ -1,83 +1,37 @@
 package main
 
 import (
-	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"time"
-
-	"github.com/ele-fant/handlers"
-	"github.com/gorilla/mux"
-	"github.com/nicholasjackson/env"
 )
 
-var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
-
 func main() {
-
-	env.Parse()
-
-	// register a function to DefaulServeMux
-	l := log.New(os.Stdout, "product-api", log.LstdFlags)
-
-	// create the handlers
-	prod_handler := handlers.NewProducts(l)
-
-	// create a new serve mux and register the handlers
-	sm := mux.NewRouter()
-
-	//.Methods("GET") --> can specify valid methods
-	getRouter := sm.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/", prod_handler.GetProducts)
-
-	putRouter := sm.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", prod_handler.UpdateProduct)
-	putRouter.Use(prod_handler.MiddlewareValidateProduct)
-
-	postRouter := sm.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/", prod_handler.AddProducts)
-	postRouter.Use(prod_handler.MiddlewareValidateProduct)
-
-	//sm.Handle("/products", ph)
-
-	// create a server
-	s := &http.Server{
-		Addr:         *bindAddress,      // configure the bind address
-		Handler:      sm,                // set the default handler
-		ErrorLog:     l,                 // set the logger for the server
-		IdleTimeout:  120 * time.Second, // max time to read request from client
-		ReadTimeout:  1 * time.Second,   // max time to write request to client
-		WriteTimeout: 1 * time.Second,   // max time for connection using TCP Keep-Alive
-	}
-
-	// start the server
-	go func() {
-		l.Println("Starting server on port 9090")
-
-		err := s.ListenAndServe()
+	// HandleFunc is a convenience function that registers a function on a path called
+	// "Default ServMux" (=http handler / http request multiplexer)
+	// The ServMux determines which function gets activated.
+	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+		log.Println("Hello World")
+		// read slices of data from the http request's body
+		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			l.Printf("Error starting server: %s\n", err)
-			os.Exit(1)
+			// inform sender on error
+			http.Error(rw, "Oops", http.StatusBadRequest)
+			return
+			// log.Println(err)
 		}
-	}()
 
-	// trap sigterm or interupt and gracefully shutdown the server
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	signal.Notify(sigChan, os.Kill)
+		// log.Printf("Data: %s\n", data)
+		// print back to the response writer
+		fmt.Fprintf(rw, "Hello %s", data)
+	})
 
-	// Block until a signal is received.
-	sig := <-sigChan
-	l.Println("Received terminate, graceful shutdown", sig)
+	http.HandleFunc("/goodbye", func(http.ResponseWriter, *http.Request) {
+		log.Println("Good bye World")
+	})
 
-	// addr = bind (here to all IP-addesses with port 9090)
-	// handler = if nil -> uses DefaulServeMux
-	//http.ListenAndServe(":9090", sm)
-
-	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
-	timeOutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
-
-	s.Shutdown(timeOutContext)
+	// BIND address, HANDLER
+	// most basic webserver; if HANDLER not specified, it uses the default ServMux
+	http.ListenAndServe(":9090", nil)
 }
