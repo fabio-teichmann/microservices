@@ -17,7 +17,7 @@ var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for t
 func main() {
 	env.Parse()
 
-	logger := log.New(os.Stdout, "product-api", log.LstdFlags)
+	logger := log.New(os.Stdout, "products-api", log.LstdFlags)
 
 	productHandler := handlers.NewProducts(logger)
 
