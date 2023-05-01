@@ -8,16 +8,21 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/nicholasjackson/env"
 )
 
+var bindAddress = env.String("BIND_ADDRESS", false, ":9090", "Bind address for the server")
+
 func main() {
+	env.Parse()
+
 	logger := log.New(os.Stdout, "product-api", log.LstdFlags)
-	handler := handlers.NewHello(logger)
-	gbHandler := handlers.NewGoodbye(logger)
+
+	productHandler := handlers.NewProducts(logger)
 
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/", handler)
-	serveMux.Handle("/goodbye", gbHandler)
+	serveMux.Handle("/", productHandler)
 
 	// HandleFunc is a convenience function that registers a function on a path called
 	// "Default ServMux" (=http handler / http request multiplexer)
@@ -36,7 +41,8 @@ func main() {
 	// - idle timeout (keep connections alive)
 	// These parameters should be tuned based on the needs
 	server := &http.Server{
-		Addr:         ":9090",
+		// Addr:         ":9090",
+		Addr:         *bindAddress,
 		Handler:      serveMux,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
@@ -47,15 +53,18 @@ func main() {
 	// server.ListenAndServe()
 	// using a go routine instead to not block
 	go func() {
+		logger.Println("Starting server on port 9090")
+
 		err := server.ListenAndServe()
 		if err != nil {
-			logger.Fatal(err)
+			logger.Printf("Error starting server: %s\n", err)
+			os.Exit(1)
 		}
 	}()
 
 	// graceful shut-down:
 	// waits for all running requests to be finished
-	sigChan := make(chan os.Signal)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
 	signal.Notify(sigChan, os.Kill)
 
