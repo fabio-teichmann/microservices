@@ -47,8 +47,16 @@ func GetProducts() Products {
 
 func (p *Products) ToJSON(w io.Writer) error {
 	// encapsulate json translation logic
-	// Encoder does not allocate additional memory but rather
-	// writes it directly to stream.
+	// Encoder does not allocate additional memory (buffering) but rather
+	// writes it directly to stream. This reduces memory and overhead of
+	// the service.
 	encoder := json.NewEncoder(w)
 	return encoder.Encode(p)
+}
+
+func (p *Product) FromJSON(r io.Reader) error {
+	// encapsulate json translation logic
+	// Decoder translates back from JSON into struct
+	decoder := json.NewDecoder(r)
+	return decoder.Decode(p)
 }
