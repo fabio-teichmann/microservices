@@ -20,6 +20,10 @@ func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == http.MethodPost {
+		p.addProduct(rw, r)
+		return
+	}
 	// handle UPDATE
 
 	// catch all other cases
@@ -27,6 +31,8 @@ func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Products) getProducts(rw http.ResponseWriter, r *http.Request) {
+	p.logger.Println("handle GET Products")
+
 	listProducts := data.GetProducts()
 	// encoding JSON using marshal -> allocates data to memory
 	// d, err := json.Marshal(listProducts) DEPRECATED
@@ -36,4 +42,17 @@ func (p *Products) getProducts(rw http.ResponseWriter, r *http.Request) {
 	}
 	// write marshalled data
 	// rw.Write(d) DEPRECATED
+}
+
+func (p *Products) addProduct(rw http.ResponseWriter, r *http.Request) {
+	p.logger.Println("handle POST Products")
+
+	prod := &data.Product{}
+	// pass reader into the FromJSON function
+	err := prod.FromJSON(r.Body)
+	if err != nil {
+		http.Error(rw, "unable to unmarshal json", http.StatusBadRequest)
+	}
+
+	p.logger.Printf("Prod %#v", prod)
 }
