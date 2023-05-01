@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 )
 
@@ -21,8 +22,19 @@ func main() {
 
 	productHandler := handlers.NewProducts(logger)
 
-	serveMux := http.NewServeMux()
-	serveMux.Handle("/", productHandler)
+	// serveMux := http.NewServeMux()
+	// replacing serveMux with Gorilla mux router
+	serveMux := mux.NewRouter()
+	// create subrouter for GET requests
+	getRouter := serveMux.Methods(http.MethodGet).Subrouter()
+
+	getRouter.HandleFunc("/", productHandler.GetProducts)
+
+	putRouter := serveMux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", productHandler.UpdateProduct)
+
+	// serveMux.Handle("/products", productHandler)
+	// serveMux.Handle("/", productHandler)
 
 	// HandleFunc is a convenience function that registers a function on a path called
 	// "Default ServMux" (=http handler / http request multiplexer)
