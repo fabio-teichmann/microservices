@@ -4,6 +4,8 @@ import (
 	"log"
 	"microservice/data"
 	"net/http"
+	"regexp"
+	"strconv"
 )
 
 type Products struct {
@@ -25,6 +27,31 @@ func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// handle UPDATE
+	if r.Method == http.MethodPut {
+		// expect ID in the URI
+		reg := regexp.MustCompile(`/([0-9]+)`)
+		groups := reg.FindAllStringSubmatch(r.URL.Path, -1)
+
+		if len(groups) != 1 {
+			http.Error(rw, "invalid URI", http.StatusBadRequest)
+			return
+		}
+
+		if len(groups[0]) != 2 {
+			http.Error(rw, "incalid URI", http.StatusBadRequest)
+		}
+
+		idString := groups[0][1]
+		id, err := strconv.Atoi(idString)
+		if err != nil {
+			http.Error(rw, "invalid URI", http.StatusBadRequest)
+			return
+		}
+		// p.logger.Println("got id:", id)
+
+		p.updateProduct(id, rw, r)
+		return
+	}
 
 	// catch all other cases
 	rw.WriteHeader(http.StatusMethodNotAllowed)
@@ -55,4 +82,25 @@ func (p *Products) addProduct(rw http.ResponseWriter, r *http.Request) {
 	}
 	data.AddProduct(prod)
 	// p.logger.Printf("Prod %#v", prod)
+}
+
+func (p *Products) updateProduct(id int, rw http.ResponseWriter, r *http.Request) {
+	p.logger.Println("handle PUT Products")
+
+	prod := &data.Product{}
+
+	err := prod.FromJSON(r.Body)
+	if err != nil {
+		http.Error(rw, "unable to unmarshal json", http.StatusBadRequest)
+	}
+	err = data.UpdateProduct(id, prod)
+	if err == data.ErrProductNotFound {
+		http.Error(rw, "product not found", http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(rw, "product not found", http.StatusInternalServerError)
+		return
+	}
 }
