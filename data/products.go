@@ -1,6 +1,10 @@
 package data
 
-import "time"
+import (
+	"encoding/json"
+	"io"
+	"time"
+)
 
 // Product defines the structure for an API product
 type Product struct {
@@ -13,6 +17,8 @@ type Product struct {
 	UpdatedOn   string  `json:"-"`
 	DeletedOn   string  `json:"-"`
 }
+
+type Products []*Product
 
 var productList = []*Product{
 	&Product{
@@ -35,6 +41,14 @@ var productList = []*Product{
 	},
 }
 
-func GetProducts() []*Product {
+func GetProducts() Products {
 	return productList
+}
+
+func (p *Products) ToJSON(w io.Writer) error {
+	// encapsulate json translation logic
+	// Encoder does not allocate additional memory but rather
+	// writes it directly to stream.
+	encoder := json.NewEncoder(w)
+	return encoder.Encode(p)
 }
