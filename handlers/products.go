@@ -21,9 +21,6 @@ import (
 	"log"
 	"microservice/data"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 type Products struct {
@@ -74,52 +71,6 @@ func NewProducts(l *log.Logger) *Products {
 // 	// catch all other cases
 // 	rw.WriteHeader(http.StatusMethodNotAllowed)
 // }
-
-func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
-	p.logger.Println("handle GET Products")
-
-	listProducts := data.GetProducts()
-	// encoding JSON using marshal -> allocates data to memory
-	// d, err := json.Marshal(listProducts) DEPRECATED
-	err := listProducts.ToJSON(rw)
-	if err != nil {
-		http.Error(rw, "unable to marshal JSON", http.StatusInternalServerError)
-	}
-	// write marshalled data
-	// rw.Write(d) DEPRECATED
-}
-
-func (p *Products) AddProduct(rw http.ResponseWriter, r *http.Request) {
-	p.logger.Println("handle POST Products")
-
-	prod := r.Context().Value(KeyProduct{}).(data.Product)
-	data.AddProduct(&prod)
-}
-
-func (p *Products) UpdateProduct(rw http.ResponseWriter, r *http.Request) {
-	// inputs extracted into mux.Vars()
-	vars := mux.Vars(r)
-
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(rw, "unable to convert id string", http.StatusBadRequest)
-	}
-
-	p.logger.Println("handle PUT Products", id)
-	// cast KeyProduct into target structure
-	prod := r.Context().Value(KeyProduct{}).(data.Product)
-
-	err = data.UpdateProduct(id, &prod)
-	if err == data.ErrProductNotFound {
-		http.Error(rw, "product not found", http.StatusNotFound)
-		return
-	}
-
-	if err != nil {
-		http.Error(rw, "product not found", http.StatusInternalServerError)
-		return
-	}
-}
 
 type KeyProduct struct{}
 
