@@ -5,9 +5,28 @@ info:
     description: Documentation for Product API
     title: of Product API
     version: 1.0.0
-paths: {}
+paths:
+    /products:
+        get:
+            consumes:
+                - application/json
+            description: Returns a list of products
+            operationId: GetProducts
+            responses:
+                "200":
+                    $ref: '#/responses/productsResponse'
+                "500":
+                    $ref: '#/responses/unableToMarshalJSON'
+            tags:
+                - products
 produces:
     - application/json
+responses:
+    productsResponse:
+        description: A list of products returned in the response
+        schema:
+            items: {}
+            type: array
 schemes:
     - http
 swagger: "2.0"
