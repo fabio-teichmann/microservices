@@ -72,6 +72,14 @@ func NewProducts(l *log.Logger) *Products {
 // 	rw.WriteHeader(http.StatusMethodNotAllowed)
 // }
 
+// A list of products returned in the response
+// swagger:response productsResponse
+type productsResponse struct {
+	// All products in the system
+	// in: body
+	Body []data.Product
+}
+
 type KeyProduct struct{}
 
 func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {

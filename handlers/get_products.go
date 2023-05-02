@@ -5,7 +5,21 @@ import (
 	"net/http"
 )
 
+// swagger:route GET /products products GetProducts
+// Returns a list of products
+//
+//  Consumes:
+//   - application/json
+//
+//  Deprecated: false
+//
+//  Responses:
+//   200: productsResponse
+//	 500: unableToMarshalJSON
+
+// GetProducts returns the products from the data store
 func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
+
 	p.logger.Println("handle GET Products")
 
 	listProducts := data.GetProducts()
