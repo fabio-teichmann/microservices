@@ -2,19 +2,10 @@ basePath: /
 consumes:
     - application/json
 info:
-    description: '# Documentation of Product API'
+    description: Documentation for Product API
     title: of Product API
     version: 1.0.0
-paths:
-    /products:
-        get:
-            description: Returns a list of products
-            operationId: listProducts
-            responses:
-                "200":
-                    $ref: '#/responses/productsResponse'
-            tags:
-                - products
+paths: {}
 produces:
     - application/json
 schemes:
