@@ -3,6 +3,3 @@ check_install:
 
 swagger: check_install
 	GO111MODULE=off swagger generate spec -o ./swagger.yaml --scan-models
-
-swag:
-	swag init --parseDependency -g handlers/products.go
