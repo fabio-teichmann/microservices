@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 )
@@ -39,15 +40,16 @@ func main() {
 	// register middleware on subrouter
 	postRouter.Use(productHandler.MiddlewareProductValidation)
 
-	// serveMux.Handle("/products", productHandler)
-	// serveMux.Handle("/", productHandler)
+	deleteRouter := serveMux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/{id:[0-9]+}", productHandler.DeleteProduct)
 
-	// HandleFunc is a convenience function that registers a function on a path called
-	// "Default ServMux" (=http handler / http request multiplexer)
-	// The ServMux determines which function gets activated.
-	// http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+	// documentation handler using ReDoc middleware
+	options := middleware.RedocOpts{SpecURL: "/swagger.yaml"} // per defaults looks for .json
+	sh := middleware.Redoc(options, nil)
 
-	// })
+	getRouter.Handle("/docs", sh)
+	// serve swagger.yaml
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// creating an HTTP server
 	// Some of the properties are:
