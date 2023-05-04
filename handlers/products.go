@@ -99,7 +99,7 @@ func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 			http.Error(rw, fmt.Sprintf("Error validating product: %s\n", err), http.StatusBadRequest)
 			return
 		}
-
+		// store passed data in context to be accesible for handling
 		ctx := context.WithValue(r.Context(), KeyProduct{}, prod)
 		r = r.WithContext(ctx)
 

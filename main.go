@@ -40,6 +40,9 @@ func main() {
 	// register middleware on subrouter
 	postRouter.Use(productHandler.MiddlewareProductValidation)
 
+	deleteRouter := serveMux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/{id:[0-9]+}", productHandler.DeleteProduct)
+
 	// documentation handler using ReDoc middleware
 	options := middleware.RedocOpts{SpecURL: "/swagger.yaml"} // per defaults looks for .json
 	sh := middleware.Redoc(options, nil)
@@ -47,6 +50,7 @@ func main() {
 	getRouter.Handle("/docs", sh)
 	// serve swagger.yaml
 	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+
 	// creating an HTTP server
 	// Some of the properties are:
 	// - address
