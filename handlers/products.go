@@ -1,18 +1,3 @@
-// Package classification of Product API
-//
-// Documentation for Product API
-//
-//	Schemes: http
-//	BasePath: /
-//	Version: 1.0.0
-//
-//	Consumes:
-//	- application/json
-//
-//	Produces:
-//	- application/json
-//
-// swagger:meta
 package handlers
 
 import (
@@ -71,14 +56,6 @@ func NewProducts(l *log.Logger) *Products {
 // 	// catch all other cases
 // 	rw.WriteHeader(http.StatusMethodNotAllowed)
 // }
-
-// A list of products returned in the response
-// swagger:response productsResponse
-type productsResponse struct {
-	// All products in the system
-	// in: body
-	Body []data.Product
-}
 
 type KeyProduct struct{}
 
