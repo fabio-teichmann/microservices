@@ -1,6 +1,10 @@
 basePath: /
 consumes:
     - application/json
+definitions:
+    Product:
+        description: Product defines the structure for an API product
+        x-go-package: microservice/data
 info:
     description: Documentation for Product API
     title: of Product API
@@ -19,9 +23,20 @@ paths:
                     $ref: '#/responses/unableToMarshalJSON'
             tags:
                 - products
+    /products/{id}:
+        delete:
+            description: Deletes a product from the database
+            operationId: deleteProduct
+            responses:
+                "201":
+                    $ref: '#/responses/noContent'
+            tags:
+                - products
 produces:
     - application/json
 responses:
+    noContent:
+        description: ""
     productsResponse:
         description: A list of products returned in the response
         schema:
