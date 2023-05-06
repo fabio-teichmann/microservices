@@ -18,11 +18,13 @@ type Product struct {
 	// required: true
 	// min: 1
 	ID int `json:"id"`
+
 	// product name
 	//
 	// required: true
 	// max: 90
 	Name string `json:"name" validate:"required"`
+
 	// description of the product
 	//
 	// required: false
@@ -38,7 +40,7 @@ type Product struct {
 type Products []*Product
 
 var productList = []*Product{
-	&Product{
+	{
 		ID:          1,
 		Name:        "Latte",
 		Description: "Frothy, milky coffee",
@@ -47,7 +49,7 @@ var productList = []*Product{
 		CreatedOn:   time.Now().UTC().String(),
 		UpdatedOn:   time.Now().UTC().String(),
 	},
-	&Product{
+	{
 		ID:          2,
 		Name:        "Espresso",
 		Description: "Strong coffee",

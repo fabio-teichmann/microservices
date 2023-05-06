@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// swagger:route GET /products products GetProducts
+// swagger:route GET /products products getProducts
 // Returns a list of products
 //
 //  Consumes:
