@@ -22,14 +22,18 @@ import "microservice/data"
 type productsResponse struct {
 	// All products in the system
 	// in: body
-	Body []data.Product
+	Body data.Product
 }
 
 // swagger:response noContent
 type productsNoContent struct {
 }
 
-// swagger:parameters DeleteProduct
+//swagger:response unableToMarshalJSON
+type productsUnableToMarshalJSON struct {
+}
+
+// swagger:parameters deleteProduct
 type productIDParameterWrapper struct {
 	// The id of the product to delete from the database
 	// in: path
