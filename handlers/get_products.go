@@ -22,6 +22,8 @@ func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request) {
 
 	p.logger.Println("handle GET Products")
 
+	rw.Header().Add("Content-Type", "application/json")
+
 	listProducts := data.GetProducts()
 	// encoding JSON using marshal -> allocates data to memory
 	// d, err := json.Marshal(listProducts) DEPRECATED

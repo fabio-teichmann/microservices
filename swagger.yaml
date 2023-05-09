@@ -1,84 +1,86 @@
 basePath: /
 consumes:
-  - application/json
+    - application/json
 definitions:
-  Product:
-    description: Product Product defines the structure for an API product
-    properties:
-      description:
-        description: description of the product
-        maximum: 120
-        type: string
-        x-go-name: Description
-      id:
-        description: product id
-        format: int64
-        minimum: 1
-        type: integer
-        x-go-name: ID
-      name:
-        description: product name
-        maximum: 90
-        type: string
-        x-go-name: Name
-      price:
-        format: float
-        type: number
-        x-go-name: Price
-      sku:
-        type: string
-        x-go-name: SKU
-    required:
-      - id
-      - name
-    type: object
-    x-go-package: microservice/client/models
+    Product:
+        description: Product Product Product defines the structure for an API product
+        properties:
+            description:
+                description: description of the product
+                maximum: 120
+                type: string
+                x-go-name: Description
+            id:
+                description: product id
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: ID
+            name:
+                description: product name
+                maximum: 90
+                type: string
+                x-go-name: Name
+            price:
+                description: price
+                format: float
+                type: number
+                x-go-name: Price
+            sku:
+                description: s k u
+                type: string
+                x-go-name: SKU
+        required:
+            - id
+            - name
+        type: object
+        x-go-package: microservice/models
 info:
-  description: Documentation for Product API
-  title: of Product API
-  version: 1.0.0
+    description: Documentation for Product API
+    title: of Product API
+    version: 1.0.0
 paths:
-  /products:
-    get:
-      consumes:
-        - application/json
-      description: Returns a list of products
-      operationId: getProducts
-      responses:
-        "200":
-          $ref: "#/responses/productsResponse"
-        "500":
-          $ref: "#/responses/unableToMarshalJSON"
-      tags:
-        - products
-  /products/{id}:
-    delete:
-      description: Deletes a product from the database
-      operationId: deleteProduct
-      parameters:
-        - description: The id of the product to delete from the database
-          format: int64
-          in: path
-          name: id
-          required: true
-          type: integer
-          x-go-name: ID
-      responses:
-        "201":
-          $ref: "#/responses/noContent"
-      tags:
-        - products
+    /products:
+        get:
+            consumes:
+                - application/json
+            description: Returns a list of products
+            operationId: getProducts
+            responses:
+                "200":
+                    $ref: '#/responses/productsResponse'
+                "500":
+                    $ref: '#/responses/unableToMarshalJSON'
+            tags:
+                - products
+    /products/{id}:
+        delete:
+            description: Deletes a product from the database
+            operationId: deleteProduct
+            parameters:
+                - description: The id of the product to delete from the database
+                  format: int64
+                  in: path
+                  name: id
+                  required: true
+                  type: integer
+                  x-go-name: ID
+            responses:
+                "201":
+                    $ref: '#/responses/noContent'
+            tags:
+                - products
 produces:
-  - application/json
+    - application/json
 responses:
-  noContent:
-    description: ""
-  productsResponse:
-    description: A list of products returned in the response
-    schema:
-      $ref: "#/definitions/Product"
-  unableToMarshalJSON:
-    description: ""
+    noContent:
+        description: ""
+    productsResponse:
+        description: A list of products returned in the response
+        schema:
+            $ref: '#/definitions/Product'
+    unableToMarshalJSON:
+        description: ""
 schemes:
-  - http
+    - http
 swagger: "2.0"
