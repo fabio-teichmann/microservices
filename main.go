@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-openapi/runtime/middleware"
+	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 )
@@ -50,9 +51,10 @@ func main() {
 	sh := middleware.Redoc(options, nil)
 
 	getRouter.Handle("/docs", sh)
-	// serve swagger.yaml
-	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./"))) // serve swagger.yaml
 
+	// add cors handler to front-end address (to be implemented)
+	corsHandler := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"http://localhost:3000"}))
 	// creating an HTTP server
 	// Some of the properties are:
 	// - address
@@ -65,7 +67,7 @@ func main() {
 	server := &http.Server{
 		// Addr:         ":9090",
 		Addr:         *bindAddress,
-		Handler:      serveMux,
+		Handler:      corsHandler(serveMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
