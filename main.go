@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"microservice/data"
 	"microservice/handlers"
 	"net/http"
 	"os"
@@ -20,8 +21,9 @@ func main() {
 	env.Parse()
 
 	logger := log.New(os.Stdout, "products-api", log.LstdFlags)
+	validator := data.NewValidator()
 
-	productHandler := handlers.NewProducts(logger)
+	productHandler := handlers.NewProducts(logger, validator)
 
 	// serveMux := http.NewServeMux()
 	// replacing serveMux with Gorilla mux router

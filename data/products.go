@@ -4,10 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"regexp"
 	"time"
-
-	"github.com/go-playground/validator"
 )
 
 // Product defines the structure for an API product
@@ -121,24 +118,4 @@ func (p *Product) FromJSON(r io.Reader) error {
 	// Decoder translates back from JSON into struct
 	decoder := json.NewDecoder(r)
 	return decoder.Decode(p)
-}
-
-func (p *Product) Validate() error {
-	validate := validator.New()
-	// register custom validation function on specific tags
-	// in this case for sku
-	validate.RegisterValidation("sku", validateSKU)
-	return validate.Struct(p)
-}
-
-func validateSKU(fl validator.FieldLevel) bool {
-	// sku is of format abc-abcd-abcde
-	re := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
-	matches := re.FindAllString(fl.Field().String(), -1)
-
-	if len(matches) != 1 {
-		return false
-	}
-
-	return true
 }
