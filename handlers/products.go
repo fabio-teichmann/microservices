@@ -2,18 +2,18 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"microservice/data"
 	"net/http"
 )
 
 type Products struct {
-	logger *log.Logger
+	logger    *log.Logger
+	validator *data.Validation
 }
 
-func NewProducts(l *log.Logger) *Products {
-	return &Products{l}
+func NewProducts(l *log.Logger, v *data.Validation) *Products {
+	return &Products{l, v}
 }
 
 // func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -59,8 +59,20 @@ func NewProducts(l *log.Logger) *Products {
 
 type KeyProduct struct{}
 
+// GenericError is a generic error message returned by a server
+type GenericError struct {
+	Message string `json:"message"`
+}
+
+// ValidationError is a collection of validation error messages
+type ValidationError struct {
+	Messages []string `json:"messages"`
+}
+
 func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
+
 		prod := data.Product{}
 
 		err := prod.FromJSON(r.Body)
@@ -70,10 +82,14 @@ func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 		}
 
 		// validate the product
-		err = prod.Validate()
-		if err != nil {
-			p.logger.Println("[ERROR] validating product", err)
-			http.Error(rw, fmt.Sprintf("Error validating product: %s\n", err), http.StatusBadRequest)
+		errs := p.validator.Validate(prod)
+		if errs != nil {
+			p.logger.Println("[ERROR] validating product", errs)
+
+			// return the validation messages as an array
+			rw.WriteHeader(http.StatusUnprocessableEntity)
+			data.ToJSON(&ValidationError{Messages: errs.Errors()}, rw)
+			// http.Error(rw, fmt.Sprintf("Error validating product: %s\n", err), http.StatusBadRequest)
 			return
 		}
 		// store passed data in context to be accesible for handling
