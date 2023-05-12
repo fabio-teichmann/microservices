@@ -95,7 +95,9 @@ func main() {
 	sig := <-sigChan
 	logger.Println("Received terminate, graceful shutdown", sig)
 
-	timeoutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	timeoutContext, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancelFunc()
+
 	server.Shutdown(timeoutContext)
 
 	// BIND address, HANDLER
