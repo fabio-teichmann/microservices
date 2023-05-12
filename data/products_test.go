@@ -8,8 +8,8 @@ func TestChecksValidation(t *testing.T) {
 		Price: 1.00,
 		SKU:   "abs-abc-abc",
 	}
-
-	err := p.Validate()
+	validator := NewValidator()
+	err := validator.Validate(p)
 
 	if err != nil {
 		t.Fatal(err)
