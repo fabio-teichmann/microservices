@@ -52,22 +52,17 @@ func validateSKU(fl validator.FieldLevel) bool {
 	re := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
 	matches := re.FindAllString(fl.Field().String(), -1)
 
-	if len(matches) != 1 {
-		return false
-	}
-
-	return true
+	return len(matches) == 1
 }
 
 func (v *Validation) Validate(i interface{}) ValidationErrors {
-	errs := v.validate.Struct(i).(validator.ValidationErrors)
-
-	if len(errs) == 0 {
+	errs := v.validate.Struct(i)
+	if errs == nil {
 		return nil
 	}
 
 	var returnErrs ValidationErrors
-	for _, err := range errs {
+	for _, err := range errs.(validator.ValidationErrors) {
 		// cast the FieldError into our ValidationError and append to the slice
 		ve := ValidationError{err.(validator.FieldError)}
 		returnErrs = append(returnErrs, ve)
